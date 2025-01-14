@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import { 
-  Button, 
-  TextField, 
-  Select, 
-  MenuItem, 
-  FormControl, 
-  InputLabel, 
-  Box, 
-  Typography, 
-  Grid, 
-  Container 
+import {
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Box,
+  Typography,
+  Grid,
+  Container,
 } from "@mui/material";
 import DraggableField from "../components/DraggableField";
 import DropZone from "../components/DropZone";
-import { formValidationSchema } from "../hooks/useValidation";
+import { generateDynamicSchema  } from "../hooks/useValidation";
+import { z } from "zod";
+
 
 const FormBuilder = () => {
   const [formFields, setFormFields] = useState([]);
@@ -21,59 +23,30 @@ const FormBuilder = () => {
   const [errors, setErrors] = useState({});
   const [previewMode, setPreviewMode] = useState(false);
   const [responses, setResponses] = useState([]);
-  const [jsonSchema, setJsonSchema] = useState(null); 
+  const [jsonSchema, setJsonSchema] = useState(null);
 
   const templates = {
     contactForm: [
       { type: "text", label: "Name", name: "name" },
       { type: "text", label: "Email", name: "email" },
-      { type: "radio", label: "Subscribe?", name: "subscribe" },
+      { type: "radio", label: "Subscribe?", name: "subscribe", options: ["Yes", "No"] },
     ],
     surveyForm: [
       { type: "text", label: "Survey Title", name: "survey_title" },
-      { type: "select", label: "Rating", name: "rating" },
+      { type: "select", label: "Rating", name: "rating", options: ["1", "2", "3", "4", "5"] },
     ],
   };
-  const generateFormSchema = (formFields) => {
-    return formFields.map((field, index) => {
-      let schema = {
-        type: "object",
-        properties: {},
-        required: [],
-      };
 
-      switch (field.type) {
-        case "text":
-          schema.properties[field.name || `text_${index}`] = {
-            type: "string",
-            title: field.label || `Text Field ${index + 1}`,
-            minLength: 1,
-          };
-          schema.required.push(field.name || `text_${index}`);
-          break;
-        case "select":
-          schema.properties[field.name || `select_${index}`] = {
-            type: "string",
-            title: field.label || `Select Field ${index + 1}`,
-            enum: field.options || [],
-          };
-          schema.required.push(field.name || `select_${index}`);
-          break;
-        case "radio":
-          schema.properties[field.name || `radio_${index}`] = {
-            type: "string",
-            title: field.label || `Radio Field ${index + 1}`,
-            enum: field.options || [],
-          };
-          schema.required.push(field.name || `radio_${index}`);
-          break;
-        default:
-          break;
-      }
-
-      return schema;
-    });
+  const handleTemplateSelect = (templateName) => {
+    const selectedTemplate = templates[templateName];
+    if (selectedTemplate) {
+      setFormFields(selectedTemplate);
+      setFormData({});
+      setErrors({});
+      alert(`Template "${templateName}" loaded successfully!`);
+    }
   };
+
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -86,8 +59,8 @@ const FormBuilder = () => {
       ...prev,
       {
         type: item.type,
-        label: `${item.type} Field ${prev.length + 1}`, // Default label
-        options: item.type === "select" || item.type === "radio" ? ["Option 1", "Option 2"] : [], // Default options
+        label: `${item.type} Field ${prev.length + 1}`,
+        options: item.type === "select" || item.type === "radio" ? ["Option 1", "Option 2"] : [],
       },
     ]);
   };
@@ -133,9 +106,7 @@ const FormBuilder = () => {
               <InputLabel>{field.label}</InputLabel>
               <Select
                 value={formData[`select_${index}`] || ""}
-                onChange={(e) =>
-                  handleInputChange(`select_${index}`, e.target.value)
-                }
+                onChange={(e) => handleInputChange(`select_${index}`, e.target.value)}
                 label={field.label}
               >
                 {(field.options || []).map((option, idx) => (
@@ -253,36 +224,77 @@ const FormBuilder = () => {
         return null;
     }
   };
+
+  // Function to generate JSON schema for the form
+  const generateFormSchema = (fields, formData) => {
+    const schema = {
+      title: "Form Schema",
+      type: "object",
+      properties: {},
+      required: [],
+    };
   
+    fields.forEach((field) => {
+      const fieldName = field.name || field.label.toLowerCase().replace(/ /g, "_"); // Use field.name or a formatted label
+  
+      const fieldSchema = {
+        title: field.label,
+        type: field.type === "text" ? "string" : field.type === "radio" ? "string" : "array",
+      };
+  
+      // Add the user's answer if it exists in formData
+      const userAnswer = formData[fieldName]; // Access the formData using the correct fieldName
+  
+      if (userAnswer !== undefined) {
+        fieldSchema.answer = userAnswer; // Add the answer to the schema
+      }
+  
+      if (field.type === "select" || field.type === "radio") {
+        fieldSchema.enum = field.options || [];
+      }
+  
+      schema.properties[fieldName] = fieldSchema;
+  
+      // Add required fields if needed
+      if (field.required) {
+        schema.required.push(fieldName);
+      }
+    });
+  
+    return schema;
+  };
+  
+  
+
 
   const handleSubmit = () => {
     try {
-      formValidationSchema.parse(formData);
+      const dynamicSchema = generateDynamicSchema(formFields); // Use the dynamically generated schema
+      dynamicSchema.parse(formData); // Validate form data
       setErrors({});
       setResponses((prev) => [...prev, formData]);
+  
+      // Pass formData to include user answers in the schema
+      const schema = generateFormSchema(formFields, formData);
+      console.log("Generated Schema with Answers:", schema);
+      setJsonSchema(schema); // Set the generated JSON schema
       alert("Form submitted successfully!");
       setFormData({});
     } catch (err) {
-      const validationErrors = err.flatten().fieldErrors;
-      setErrors(validationErrors);
-    }
-    const generatedSchema = generateFormSchema(formFields); // Corrected here
-    setJsonSchema(generatedSchema); 
-  };
-
-  const handleTemplateSelect = (templateName) => {
-    const selectedTemplate = templates[templateName];
-    if (selectedTemplate) {
-      setFormFields(selectedTemplate);
-      setFormData({});
-      setErrors({});
-      alert(`Template "${templateName}" loaded successfully!`);
+      if (err instanceof z.ZodError) {
+        const validationErrors = err.errors.reduce((acc, curr) => {
+          acc[curr.path[0]] = curr.message;
+          return acc;
+        }, {});
+        console.error("Validation Errors:", validationErrors);
+        setErrors(validationErrors); // Set the validation errors
+      } else {
+        console.error("Unexpected Error:", err);
+      }
     }
   };
+  
 
-  const clearResponses = () => {
-    setResponses([]);
-  };
 
   return (
     <Container maxWidth="lg" style={{ padding: "20px" }}>
@@ -331,39 +343,31 @@ const FormBuilder = () => {
         </Grid>
       </Grid>
 
-      <Button variant="outlined" color="primary" onClick={handleSubmit} style={{ marginTop: "10px" }}>
+      <Button
+        variant="outlined"
+        color="primary"
+        onClick={handleSubmit}
+        style={{ marginTop: "10px" }}
+      >
         Submit Form
       </Button>
 
-      {responses.length > 0 && (
-        <Box mt={4}>
-          <Typography variant="h5">Form Responses</Typography>
-          <table border="1" cellPadding="5" style={{ width: "100%" }}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Response</th>
-              </tr>
-            </thead>
-            <tbody>
-              {responses.map((response, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <pre>{JSON.stringify(response, null, 2)}</pre>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={clearResponses}
-            style={{ marginTop: "10px" }}
+      {previewMode && jsonSchema && (
+        <Box mt={4} p={2} style={{ backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
+          <Typography variant="h5" gutterBottom>
+            Generated JSON Schema
+          </Typography>
+          <pre
+            style={{
+              overflowX: "auto",
+              padding: "10px",
+              backgroundColor: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+            }}
           >
-            Clear Responses
-          </Button>
+            {JSON.stringify(jsonSchema, null, 2)}
+          </pre>
         </Box>
       )}
     </Container>
