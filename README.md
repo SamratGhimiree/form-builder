@@ -1,70 +1,97 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+# **Interactive Form Builder**
 
-In the project directory, you can run:
+A drag-and-drop form builder application that allows users to design, preview, validate, and manage forms easily. Built using **React** and **Material-UI**, it includes features like form templates, input validation, preview mode, and form response visualization.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## **Features**
+- **Drag-and-Drop Builder**: Build custom forms by dragging components (text fields, select dropdowns, radio buttons, etc.) to the canvas.
+- **Form Validation**: Schema-based validation implemented with **Zod**.
+- **Preview Mode**: Toggle between edit and preview modes for form testing.
+- **JSON Schema Generation**: Automatically generates a JSON schema for the designed form.
+- **Form Templates**: Predefined templates (e.g., Contact Form, Survey Form) to kickstart the form creation process.
+- **Response Visualization**: View submitted form responses in a table.
+- **Performance Optimization**: Leveraging **React.memo** and **useMemo** to minimize re-renders.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## **Installation and Setup**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### **Prerequisites**
+- Node.js (version 16 or later)
+- npm or yarn package manager
 
-### `npm run build`
+### **Setup Instructions**
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/your-username/interactive-form-builder.git
+   cd interactive-form-builder
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. **Start the Development Server**:
+   ```bash
+   npm start
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4. Open your browser and navigate to `http://localhost:3000` to see the app in action.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## **Usage**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### **Drag-and-Drop Builder**
+1. Drag fields like text, select, or radio buttons from the "Field Library" into the "Form Builder" area.
+2. Customize field labels, options, and placeholders directly in the form editor.
+3. Save your form and preview it using the **Preview Mode** toggle.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### **Preview Mode**
+- Switch to Preview Mode to test the form as a user would interact with it.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### **Form Templates**
+- Select a predefined template from the dropdown menu to auto-populate the form builder with commonly used fields.
 
-## Learn More
+### **Validation**
+- Zod validation ensures the form data is valid before submission. Errors are displayed under the respective fields.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### **Form Responses**
+- After submitting the form in preview mode, responses are stored and displayed in a table under the "Form Responses" section.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## **Technology Choices**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### **Frontend**
+- **React**: Chosen for its efficient rendering, component-based architecture, and ease of use.
+- **Material-UI**: For prebuilt, customizable components to improve UI consistency and speed up development.
 
-### Analyzing the Bundle Size
+### **Validation**
+- **Zod**: Lightweight and modern library for schema-based input validation, integrated seamlessly with React state management.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### **Optimization**
+- **React.memo**: Prevents unnecessary re-renders of components.
+- **useMemo**: Optimizes computationally expensive operations.
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## **Known Limitations**
+1. **No Persistence**: Form configuration and responses are not saved across sessions.
+2. **Limited Field Types**: Currently supports only text, select, and radio input types.
+3. **Basic Conditional Logic**: Conditional logic is supported in the backend but lacks a user-friendly UI for defining rules.
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## **Future Enhancements**
+1. **Persistence**: Add support for saving and loading forms and responses from a database or local storage.
+2. **Advanced Field Types**: Include support for checkboxes, date pickers, file uploads, and more.
+3. **UI for Conditional Logic**: Create a visual editor for defining conditional rules between fields.
+4. **Real-Time Collaboration**: Enable multiple users to collaborate on form creation.
+5. **Theme Customization**: Allow users to style their forms.
+6. **Comprehensive Unit Tests**: Add automated tests for all core functionalities using **Jest** and **React Testing Library**.
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
